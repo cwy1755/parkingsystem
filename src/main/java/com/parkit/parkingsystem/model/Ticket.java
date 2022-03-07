@@ -58,4 +58,13 @@ public class Ticket {
     public void setOutTime(Date outTime) {
         this.outTime = outTime;
     }
+    
+    @Override
+    public String toString() {
+    	return   "id: "               + id +
+    	       ", vehicleRegNumber: " + vehicleRegNumber +
+    	       ", price: "            + price +
+    	       ", inTime: "           + inTime.toString() +
+    	       ", outTime: "          + outTime.toString();
+    }
 }
