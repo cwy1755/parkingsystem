@@ -16,10 +16,10 @@ public class FareCalculatorService {
 	 */
     public void calculateFare(Ticket ticket)
     {
-    	logger.debug("Start calculateFare: " + ticket.getId());
+    	logger.info("Start calculateFare: " + ticket.getId());
     	
-    	logger.trace("ticket: " + ticket.toString() );
-    	logger.trace("ParkingSpot: " + ticket.getParkingSpot().toString() );
+    	logger.debug("ticket: " + ticket.toString() );
+    	logger.debug("ParkingSpot: " + ticket.getParkingSpot().toString() );
     	
         if( (ticket.getOutTime() == null) || (ticket.getOutTime().before(ticket.getInTime())) ){
         	logger.warn("Ticket: " + ticket.getId() + " : Inconsistent Date: inTime: " + ticket.getInTime().toString() + ", outTime: " + ticket.getOutTime().toString() );
@@ -39,6 +39,7 @@ public class FareCalculatorService {
                 break;
             }
             default: {
+            	System.out.println("Unkown Parking Type");
             	logger.warn("Ticket: " + ticket.getId() + " : Parking Type unknown: " + ticket.getParkingSpot().getParkingType());
             	throw new IllegalArgumentException("Unkown Parking Type");
             }

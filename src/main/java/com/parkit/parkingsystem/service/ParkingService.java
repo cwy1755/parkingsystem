@@ -30,7 +30,7 @@ public class ParkingService {
     /**
      * Incoming vehicule
      */
-    public void processIncomingVehicle() {
+    public void processIncomingVehicule() {
     	logger.debug("Start processIncomingVehicle");
         try{
             ParkingSpot parkingSpot = getNextParkingNumberIfAvailable();
@@ -42,8 +42,7 @@ public class ParkingService {
 
                 Date inTime = new Date();
                 Ticket ticket = new Ticket();
-                //ID, PARKING_NUMBER, VEHICLE_REG_NUMBER, PRICE, IN_TIME, OUT_TIME)
-                //ticket.setId(ticketID);
+
                 ticket.setParkingSpot(parkingSpot);
                 ticket.setVehicleRegNumber(vehiculeRegNumber);
                 ticket.setPrice(0);
@@ -56,6 +55,7 @@ public class ParkingService {
                 System.out.println("Recorded in-time for vehicle number:"+vehiculeRegNumber+" is:"+inTime);
             }
         }catch(Exception e){
+        	System.out.println("Unable to process incoming vehicle");
             logger.error("Unable to process incoming vehicle",e);
         }
         logger.debug("End processIncomingVehicle");
@@ -89,8 +89,10 @@ public class ParkingService {
                 throw new Exception("Error fetching parking number from DB. Parking slots might be full");
             }
         }catch(IllegalArgumentException ie){
-            logger.error("Error parsing user input for type of vehicle", ie);
+        	System.out.println("Error parsing user input for type of vehicule");
+            logger.error("Error parsing user input for type of vehicule", ie);
         }catch(Exception e){
+        	System.out.println("Error fetching next available parking slot");
             logger.error("Error fetching next available parking slot", e);
         }
         logger.debug("parkingSpot: " + parkingSpot.getId());
@@ -125,7 +127,7 @@ public class ParkingService {
     /**
      * Exiting Vehicule 
      */
-    public void processExitingVehicle() {
+    public void processExitingVehicule() {
     	logger.debug("Start processExitingVehicle");
         try{
             String vehiculeRegNumber = getVehiculeRegNumber();
@@ -144,6 +146,7 @@ public class ParkingService {
                 System.out.println("Unable to update ticket information. Error occurred");
             }
         }catch(Exception e){
+        	System.out.println("Unable to process exiting vehicle");
             logger.error("Unable to process exiting vehicle",e);
         }
         logger.debug("End processExitingVehicle");
