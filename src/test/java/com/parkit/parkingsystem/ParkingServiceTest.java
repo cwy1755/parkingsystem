@@ -54,7 +54,7 @@ public class ParkingServiceTest {
       parkingService.getNextParkingNumberIfAvailable();
       fail("Expected exception was not thrown");
     } catch (Exception e) {
-      e.printStackTrace();
+      // e.printStackTrace();
       assertTrue(true);
     }
   }
@@ -68,7 +68,7 @@ public class ParkingServiceTest {
       parkingService.getNextParkingNumberIfAvailable();
       fail("Expected exception was not thrown");
     } catch (Exception e) {
-      e.printStackTrace();
+      // e.printStackTrace();
       assertTrue(true);
     }
   }
@@ -83,7 +83,7 @@ public class ParkingServiceTest {
       parkingService.processIncomingVehicule();
       verify(parkingSpotDAO, Mockito.times(1)).updateParking(any(ParkingSpot.class));
     } catch (Exception e) {
-      fail("Exception was Expected");
+      fail("Exception not Expected");
       e.printStackTrace();
     }
   }
@@ -98,7 +98,7 @@ public class ParkingServiceTest {
       parkingService.processIncomingVehicule();
       verify(parkingSpotDAO, Mockito.times(1)).updateParking(any(ParkingSpot.class));
     } catch (Exception e) {
-      fail("Exception was Expected");
+      fail("Exception not Expected");
       e.printStackTrace();
     }
   }
@@ -121,7 +121,7 @@ public class ParkingServiceTest {
       parkingService.processExitingVehicule();
       verify(parkingSpotDAO, Mockito.times(1)).updateParking(any(ParkingSpot.class));
     } catch (Exception e) {
-      fail();
+      fail("Exception not Expected");
       e.printStackTrace();
     }
   }
@@ -142,7 +142,7 @@ public class ParkingServiceTest {
 
       parkingService.processExitingVehicule();
     } catch (Exception e) {
-      fail();
+      fail("Exception not Expected");
       e.printStackTrace();
     }
   }
