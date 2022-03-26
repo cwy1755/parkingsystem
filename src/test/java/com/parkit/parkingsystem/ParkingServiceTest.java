@@ -1,5 +1,6 @@
 package com.parkit.parkingsystem;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -51,11 +52,11 @@ public class ParkingServiceTest {
     try {
       when(inputReaderUtil.readSelection()).thenReturn(0);
 
-      parkingService.getNextParkingNumberIfAvailable();
-      fail("Expected exception was not thrown");
+      assertThat(parkingService.getNextParkingNumberIfAvailable()).isNull();
+
     } catch (Exception e) {
-      // e.printStackTrace();
-      assertTrue(true);
+      e.printStackTrace();
+      fail("Expected exception was not thrown");
     }
   }
 
@@ -65,11 +66,11 @@ public class ParkingServiceTest {
       when(inputReaderUtil.readSelection()).thenReturn(1);
       when(parkingSpotDAO.getNextAvailableSlot(any(ParkingType.class))).thenReturn(0);
 
-      parkingService.getNextParkingNumberIfAvailable();
-      fail("Expected exception was not thrown");
+      assertThat(parkingService.getNextParkingNumberIfAvailable()).isNull();
+
     } catch (Exception e) {
-      // e.printStackTrace();
-      assertTrue(true);
+      e.printStackTrace();
+      fail("Expected exception was not thrown");
     }
   }
 
@@ -83,8 +84,8 @@ public class ParkingServiceTest {
       parkingService.processIncomingVehicule();
       verify(parkingSpotDAO, Mockito.times(1)).updateParking(any(ParkingSpot.class));
     } catch (Exception e) {
-      fail("Exception not Expected");
       e.printStackTrace();
+      fail("Exception not Expected");
     }
   }
 
@@ -98,8 +99,8 @@ public class ParkingServiceTest {
       parkingService.processIncomingVehicule();
       verify(parkingSpotDAO, Mockito.times(1)).updateParking(any(ParkingSpot.class));
     } catch (Exception e) {
-      fail("Exception not Expected");
       e.printStackTrace();
+      fail("Exception not Expected");
     }
   }
 
@@ -121,8 +122,8 @@ public class ParkingServiceTest {
       parkingService.processExitingVehicule();
       verify(parkingSpotDAO, Mockito.times(1)).updateParking(any(ParkingSpot.class));
     } catch (Exception e) {
-      fail("Exception not Expected");
       e.printStackTrace();
+      fail("Exception not Expected");
     }
   }
 
@@ -142,8 +143,8 @@ public class ParkingServiceTest {
 
       parkingService.processExitingVehicule();
     } catch (Exception e) {
-      fail("Exception not Expected");
       e.printStackTrace();
+      fail("Exception not Expected");
     }
   }
 

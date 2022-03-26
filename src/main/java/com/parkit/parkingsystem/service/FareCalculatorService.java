@@ -27,8 +27,8 @@ public class FareCalculatorService {
       throw new IllegalArgumentException("Out time provided is incorrect:" + ticket.getOutTime().toString());
     }
 
-    float diff = ticket.getOutTime().getTime() - ticket.getInTime().getTime();
-    float duration = (diff / (1000 * 60) * 100 / 60 / 100);
+    long diff = ticket.getOutTime().getTime() - ticket.getInTime().getTime();
+    float duration =  ((float) diff / (1000 * 60) * 100 / 60 / 100);
 
     switch (ticket.getParkingSpot().getParkingType()) {
       case CAR: {

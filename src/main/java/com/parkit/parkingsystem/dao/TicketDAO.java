@@ -21,9 +21,11 @@ public class TicketDAO {
 
   public boolean saveTicket(Ticket ticket) {
     Connection con = null;
+    PreparedStatement ps = null;
+    boolean rcPsExecute = false;
     try {
       con = dataBaseConfig.getConnection();
-      PreparedStatement ps = con.prepareStatement(DBConstants.SAVE_TICKET);
+      ps = con.prepareStatement(DBConstants.SAVE_TICKET);
       // ID, PARKING_NUMBER, VEHICLE_REG_NUMBER, PRICE, IN_TIME, OUT_TIME)
       // ps.setInt(1,ticket.getId());
       // ID is not compute here, it is auto-compute by mysql
@@ -32,14 +34,15 @@ public class TicketDAO {
       ps.setDouble(3, ticket.getPrice());
       ps.setTimestamp(4, new Timestamp(ticket.getInTime().getTime()));
       ps.setTimestamp(5, (ticket.getOutTime() == null) ? null : (new Timestamp(ticket.getOutTime().getTime())));
-      return ps.execute();
+      rcPsExecute = ps.execute();
     } catch (Exception ex) {
       System.out.println("Error saving ticket");
       logger.error("Error saving ticket", ex);
     } finally {
+      dataBaseConfig.closePreparedStatement(ps);
       dataBaseConfig.closeConnection(con);
-      return false;
     }
+    return rcPsExecute;
   }
 
   public Ticket getTicket(String vehicleRegNumber) {
@@ -70,8 +73,8 @@ public class TicketDAO {
       dataBaseConfig.closeResultSet(rs);
       dataBaseConfig.closePreparedStatement(ps);
       dataBaseConfig.closeConnection(con);
-      return ticket;
     }
+    return ticket;
   }
 
   public boolean updateTicket(Ticket ticket) {

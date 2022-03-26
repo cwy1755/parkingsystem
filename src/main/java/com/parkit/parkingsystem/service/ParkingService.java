@@ -63,7 +63,7 @@ public class ParkingService {
   /**
    * Get the the vehicule register number.
    * 
-
+   * 
    * @return vehicule register number
    * 
    * @throws Exception not treat
@@ -78,7 +78,7 @@ public class ParkingService {
   /**
    * Find an available spot for a vehicule type.
    * 
-
+   * 
    * @return free parking spot
    */
   public ParkingSpot getNextParkingNumberIfAvailable() {
@@ -99,14 +99,16 @@ public class ParkingService {
       System.out.println("Error fetching next available parking slot");
       logger.error("Error fetching next available parking slot", e);
     }
-    logger.debug("parkingSpot: " + parkingSpot.getId());
+    if (parkingSpot != null) {
+      logger.debug("parkingSpot: " + parkingSpot.getId());
+    }
     return parkingSpot;
   }
 
   /**
    * get the vehicule type.
    * 
-
+   * 
    * @return vehicule type
    */
   private ParkingType getVehiculeType() {
