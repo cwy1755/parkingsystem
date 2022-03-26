@@ -1,7 +1,5 @@
 package com.parkit.parkingsystem.constants;
 
 public enum ParkingType {
-    CAR,
-    BIKE,
-    TRUC
+  CAR, BIKE, TRUC
 }
