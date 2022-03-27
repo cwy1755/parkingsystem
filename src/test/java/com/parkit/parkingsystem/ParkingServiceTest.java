@@ -17,6 +17,8 @@ import com.parkit.parkingsystem.service.ParkingService;
 import com.parkit.parkingsystem.util.InputReaderUtil;
 import java.util.Date;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -48,7 +50,8 @@ public class ParkingServiceTest {
   }
 
   @Test
-  public void processIncomingVehicule_vehiculeTypeUnexisting_Test() {
+  @DisplayName("L'utilisateur ne saisi pas le bon type de vehicule")
+  public void processIncomingVehicule_vehiculeTypeUnexisting() {
     try {
       when(inputReaderUtil.readSelection()).thenReturn(0);
 
@@ -61,7 +64,8 @@ public class ParkingServiceTest {
   }
 
   @Test
-  public void processIncomingVehicule_SlotUnAvailable_CAR_Test() {
+  @DisplayName("Une voiture entre, il n'y a plus de place pour les voitures")
+  public void processIncomingVehicule_CAR_SlotUnAvailable() {
     try {
       when(inputReaderUtil.readSelection()).thenReturn(1);
       when(parkingSpotDAO.getNextAvailableSlot(any(ParkingType.class))).thenReturn(0);
@@ -75,14 +79,17 @@ public class ParkingServiceTest {
   }
 
   @Test
-  public void processIncomingVehicule_slotAvailable_CAR_Test() {
+  @DisplayName("Une voiture entre, il y a une place, saisi immat, place parking maj, ticket créé")
+  public void processIncomingVehicule_CAR_slotAvailable() {
     try {
       when(inputReaderUtil.readSelection()).thenReturn(1);
       when(parkingSpotDAO.getNextAvailableSlot(any(ParkingType.class))).thenReturn(1);
       when(inputReaderUtil.readVehiculeRegistrationNumber()).thenReturn("ABCDEF");
 
       parkingService.processIncomingVehicule();
+      
       verify(parkingSpotDAO, Mockito.times(1)).updateParking(any(ParkingSpot.class));
+      verify(ticketDAO, Mockito.times(1)).saveTicket(any(Ticket.class));
     } catch (Exception e) {
       e.printStackTrace();
       fail("Exception not Expected");
@@ -90,14 +97,17 @@ public class ParkingServiceTest {
   }
 
   @Test
-  public void processIncomingVehicule_slotAvailable_BIKE_Test() {
+  @DisplayName("Une moto entre, il y a une place, saisi immat, place parking maj, ticket créé")
+  public void processIncomingVehicule_BIKE_slotAvailable() {
     try {
       when(inputReaderUtil.readSelection()).thenReturn(2);
       when(parkingSpotDAO.getNextAvailableSlot(any(ParkingType.class))).thenReturn(1);
       when(inputReaderUtil.readVehiculeRegistrationNumber()).thenReturn("ABCDEF");
 
       parkingService.processIncomingVehicule();
+      
       verify(parkingSpotDAO, Mockito.times(1)).updateParking(any(ParkingSpot.class));
+      verify(ticketDAO, Mockito.times(1)).saveTicket(any(Ticket.class));
     } catch (Exception e) {
       e.printStackTrace();
       fail("Exception not Expected");
@@ -105,7 +115,8 @@ public class ParkingServiceTest {
   }
 
   @Test
-  public void processExitingVehiculeCAROKTest() {
+  @DisplayName("Une voiture sort et tout est OK")
+  public void processExitingVehicule_CAR_OK() {
     try {
       ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
 
@@ -120,6 +131,7 @@ public class ParkingServiceTest {
       when(parkingSpotDAO.updateParking(any(ParkingSpot.class))).thenReturn(true);
 
       parkingService.processExitingVehicule();
+      
       verify(parkingSpotDAO, Mockito.times(1)).updateParking(any(ParkingSpot.class));
     } catch (Exception e) {
       e.printStackTrace();
@@ -127,8 +139,9 @@ public class ParkingServiceTest {
     }
   }
 
-  @Test
-  public void processExitingVehiculeCARKOTest() {
+  @Disabled
+  @DisplayName("Une voiture sort, mais pb de maj du ticket")
+  public void processExitingVehicule_CAR_AnoUpdateTicket() {
     try {
       ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
 
@@ -140,8 +153,9 @@ public class ParkingServiceTest {
       when(inputReaderUtil.readVehiculeRegistrationNumber()).thenReturn("ABCDEF");
       when(ticketDAO.getTicket(anyString())).thenReturn(ticket);
       when(ticketDAO.updateTicket(any(Ticket.class))).thenReturn(false);
-
-      parkingService.processExitingVehicule();
+      
+      // TODO
+      
     } catch (Exception e) {
       e.printStackTrace();
       fail("Exception not Expected");

@@ -11,6 +11,7 @@ import com.parkit.parkingsystem.service.FareCalculatorService;
 import java.util.Date;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 public class FareCalculatorServiceTest {
@@ -29,6 +30,7 @@ public class FareCalculatorServiceTest {
   }
 
   @Test
+  @DisplayName("Validation que le prix/heure pour une voiture est celle paramétré ")
   public void calculateFareCar() {
     Date nowTime = new Date();
 
@@ -39,12 +41,14 @@ public class FareCalculatorServiceTest {
     ticket.setInTime(inTime);
     ticket.setOutTime(outTime);
     ticket.setParkingSpot(parkingSpot);
+
     fareCalculatorService.calculateFare(ticket);
 
     assertThat(ticket.getPrice()).isEqualTo(Fare.CAR_RATE_PER_HOUR);
   }
 
   @Test
+  @DisplayName("Validation que le prix/heure pour une moto est celle paramétré ")
   public void calculateFareBike() {
     Date nowTime = new Date();
 
@@ -55,13 +59,15 @@ public class FareCalculatorServiceTest {
     ticket.setInTime(inTime);
     ticket.setOutTime(outTime);
     ticket.setParkingSpot(parkingSpot);
+
     fareCalculatorService.calculateFare(ticket);
 
     assertThat(ticket.getPrice()).isEqualTo(Fare.BIKE_RATE_PER_HOUR);
   }
 
   @Test
-  public void calculateFareNullType() {
+  @DisplayName("Validation qu'il n'y a pas calcul s'il y a un type de parking à null")
+  public void calculateFareTypeIsNull() {
     Date nowTime = new Date();
 
     Date inTime = new Date(nowTime.getTime() - (60 * 60 * 1000));
@@ -77,6 +83,7 @@ public class FareCalculatorServiceTest {
   }
 
   @Test
+  @DisplayName("Validation que le type de vehicule n'est pas géré")
   public void calculateFareUnkownType() {
     Date nowTime = new Date();
 
@@ -94,6 +101,7 @@ public class FareCalculatorServiceTest {
   }
 
   @Test
+  @DisplayName("Validation qu'il y a une erreur quand la date/heure d'entrée en postérieur à la date/heure de sortie")
   public void calculateFareBikeWithFutureInTime() {
     Date nowTime = new Date();
 
@@ -109,11 +117,10 @@ public class FareCalculatorServiceTest {
   }
 
   @Test
+  @DisplayName("Calcule du prix pour 45 minutes pour une moto")
   public void calculateFareBikeWithLessThanOneHourParkingTime() {
     Date nowTime = new Date();
 
-    // 45 minutes parking time should give 3/4th
-    // parking fare
     Date inTime = new Date(nowTime.getTime() - (45 * 60 * 1000));
     Date outTime = new Date(nowTime.getTime());
     ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.BIKE, false);
@@ -127,13 +134,11 @@ public class FareCalculatorServiceTest {
   }
 
   @Test
+  @DisplayName("Calcule du prix pour 45 minutes pour une voiture")
   public void calculateFareCarWithLessThanOneHourParkingTime() {
     Date nowTime = new Date();
 
-    // 45 minutes parking time should give 3/4th
-    // parking fare
     Date inTime = new Date(nowTime.getTime() - (45 * 60 * 1000));
-
     Date outTime = new Date(nowTime.getTime());
     ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
 
@@ -146,13 +151,11 @@ public class FareCalculatorServiceTest {
   }
 
   @Test
-  public void calculateFareCarWithMoreThanADayParkingTime() {
+  @DisplayName("Calcule du prix pour 24h pour une voiture")
+  public void calculateFareCarWithADayParkingTime() {
     Date nowTime = new Date();
 
-    // 24 hours parking time should give 24 *
-    // parking fare per hour
     Date inTime = new Date(nowTime.getTime() - (24 * 60 * 60 * 1000));
-
     Date outTime = new Date(nowTime.getTime());
     ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
 
@@ -161,8 +164,25 @@ public class FareCalculatorServiceTest {
     ticket.setParkingSpot(parkingSpot);
     fareCalculatorService.calculateFare(ticket);
 
-    assertEquals((24 * Fare.CAR_RATE_PER_HOUR), ticket.getPrice());
     assertThat(ticket.getPrice()).isEqualTo((double) Math.round(24 * Fare.CAR_RATE_PER_HOUR * 100) / 100);
+  }
+
+  @Test
+  @DisplayName("Calcule du prix pour 23h pour une voiture")
+  public void calculateFareCarWith23hoursParkingTime() {
+    Date nowTime = new Date();
+
+    Date inTime = new Date(nowTime.getTime() - (23 * 60 * 60 * 1000));
+    Date outTime = new Date(nowTime.getTime());
+    ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
+
+    ticket.setInTime(inTime);
+    ticket.setOutTime(outTime);
+    ticket.setParkingSpot(parkingSpot);
+
+    fareCalculatorService.calculateFare(ticket);
+
+    assertThat(ticket.getPrice()).isEqualTo((double) Math.round(23 * Fare.CAR_RATE_PER_HOUR * 100) / 100);
   }
 
 }

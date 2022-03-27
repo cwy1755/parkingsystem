@@ -44,21 +44,21 @@ public class ParkingSpotDAO {
     // update the availability for that parking slot
     Connection con = null;
     PreparedStatement ps = null;
+    int updateRowCount = 0;
     try {
       con = dataBaseConfig.getConnection();
       ps = con.prepareStatement(DBConstants.UPDATE_PARKING_SPOT);
       ps.setBoolean(1, parkingSpot.isAvailable());
       ps.setInt(2, parkingSpot.getId());
-      int updateRowCount = ps.executeUpdate();
-      return (updateRowCount == 1);
+      updateRowCount = ps.executeUpdate();
     } catch (Exception ex) {
       System.out.println("Error updating parking info");
       logger.error("Error updating parking info", ex);
-      return false;
     } finally {
       dataBaseConfig.closePreparedStatement(ps);
       dataBaseConfig.closeConnection(con);
     }
+    return (updateRowCount == 1);
   }
 
 }

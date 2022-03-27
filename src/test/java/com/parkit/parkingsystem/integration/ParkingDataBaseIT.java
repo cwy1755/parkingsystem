@@ -19,6 +19,7 @@ import java.util.Date;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -55,6 +56,7 @@ public class ParkingDataBaseIT {
   }
 
   @Test
+  @DisplayName("TI DB Une voiture entre")
   public void testParkingACar() {
     try {
       when(inputReaderUtil.readSelection()).thenReturn(1);
@@ -81,6 +83,7 @@ public class ParkingDataBaseIT {
   }
 
   @Test
+  @DisplayName("TI DB Une voiture sort")
   public void testParkingLotExit() {
     try {
       when(inputReaderUtil.readVehiculeRegistrationNumber()).thenReturn("ABCDEF");
