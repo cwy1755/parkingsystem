@@ -12,7 +12,7 @@ public class FareCalculatorService {
   /**
    * calculate fare.
    * 
-
+   * 
    * @param ticket input ticket
    */
   public void calculateFare(Ticket ticket) {
@@ -28,7 +28,13 @@ public class FareCalculatorService {
     }
 
     long diff = ticket.getOutTime().getTime() - ticket.getInTime().getTime();
-    float duration =  ((float) diff / (1000 * 60) * 100 / 60 / 100);
+    float duration = ((float) diff / (1000 * 60) * 100 / 60 / 100);
+    
+    if (duration > Fare.TIME_FREE) {
+      duration -= Fare.TIME_FREE;
+    } else {
+      duration = 0;
+    }
 
     switch (ticket.getParkingSpot().getParkingType()) {
       case CAR: {
