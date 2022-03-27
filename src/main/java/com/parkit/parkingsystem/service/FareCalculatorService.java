@@ -1,6 +1,7 @@
 package com.parkit.parkingsystem.service;
 
 import com.parkit.parkingsystem.constants.Fare;
+import com.parkit.parkingsystem.dao.TicketDAO;
 import com.parkit.parkingsystem.model.Ticket;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -8,6 +9,12 @@ import org.apache.logging.log4j.Logger;
 public class FareCalculatorService {
 
   private static final Logger logger = LogManager.getLogger(FareCalculatorService.class);
+
+  private TicketDAO ticketDAO;
+
+  public FareCalculatorService(TicketDAO ticketDAO) {
+    this.ticketDAO = ticketDAO;
+  }
 
   /**
    * calculate fare.
@@ -29,30 +36,42 @@ public class FareCalculatorService {
 
     long diff = ticket.getOutTime().getTime() - ticket.getInTime().getTime();
     float duration = ((float) diff / (1000 * 60) * 100 / 60 / 100);
-    
+
+    // Free first Fare.TIME_FREE
     if (duration > Fare.TIME_FREE) {
       duration -= Fare.TIME_FREE;
     } else {
       duration = 0;
     }
 
-    switch (ticket.getParkingSpot().getParkingType()) {
-      case CAR: {
-        ticket.setPrice((double) Math.round(duration * Fare.CAR_RATE_PER_HOUR * 100) / 100);
-        break;
+    if (duration > 0) {
+
+      boolean regularRegNumber = ticketDAO.verifyRegularRegNumberOfOneMonthDuration(ticket.getVehicleRegNumber());
+
+      float discount = 1;
+      if (regularRegNumber) {
+        discount = 1 - (float) Fare.RECURRENT_CUSTOMER_DISCOUNT_5;
       }
-      case BIKE: {
-        ticket.setPrice((double) Math.round(duration * Fare.BIKE_RATE_PER_HOUR * 100) / 100);
-        break;
-      }
-      default: {
-        System.out.println("Unkown Parking Type");
-        logger
-            .warn("Ticket: " + ticket.getId() + " : Parking Type unknown: " + ticket.getParkingSpot().getParkingType());
-        throw new IllegalArgumentException("Unkown Parking Type");
+
+      switch (ticket.getParkingSpot().getParkingType()) {
+        case CAR: {
+          ticket.setPrice((double) Math.round(duration * Fare.CAR_RATE_PER_HOUR * discount * 100) / 100);
+          break;
+        }
+        case BIKE: {
+          ticket.setPrice((double) Math.round(duration * Fare.BIKE_RATE_PER_HOUR * discount * 100) / 100);
+          break;
+        }
+        default: {
+          System.out.println("Unkown Parking Type");
+          logger.warn(
+              "Ticket: " + ticket.getId() + " : Parking Type unknown: " + ticket.getParkingSpot().getParkingType());
+          throw new IllegalArgumentException("Unkown Parking Type");
+        }
       }
     }
 
     logger.debug("End calculateFare : return duration: " + duration);
   }
+
 }

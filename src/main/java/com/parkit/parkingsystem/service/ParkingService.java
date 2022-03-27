@@ -14,16 +14,17 @@ public class ParkingService {
 
   private static final Logger logger = LogManager.getLogger("ParkingService");
 
-  private static FareCalculatorService fareCalculatorService = new FareCalculatorService();
-
   private InputReaderUtil inputReaderUtil;
   private ParkingSpotDAO parkingSpotDAO;
   private TicketDAO ticketDAO;
+
+  private FareCalculatorService fareCalculatorService;
 
   public ParkingService(InputReaderUtil inputReaderUtil, ParkingSpotDAO parkingSpotDAO, TicketDAO ticketDAO) {
     this.inputReaderUtil = inputReaderUtil;
     this.parkingSpotDAO = parkingSpotDAO;
     this.ticketDAO = ticketDAO;
+    this.fareCalculatorService = new FareCalculatorService(ticketDAO);
   }
 
   /**
@@ -36,6 +37,13 @@ public class ParkingService {
 
       if (parkingSpot != null && parkingSpot.getId() > 0) {
         String vehiculeRegNumber = getVehiculeRegNumber();
+        
+        boolean regularRegNumber = ticketDAO.verifyRegularRegNumberOfOneMonthDuration(vehiculeRegNumber);
+        
+        if (regularRegNumber) {
+          System.out.println("Welcome back! As a recurring user of our parking lot, you'll benefit from a 5% discount");
+        }
+        
         parkingSpot.setAvailable(false);
         parkingSpotDAO.updateParking(parkingSpot); // allow this parking space and mark it's availability as false
 

@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
+import java.util.Calendar;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -45,7 +46,7 @@ public class TicketDAO {
     return rcPsExecute;
   }
 
-  public Ticket getTicket(String vehicleRegNumber) {
+  public Ticket getTicket(String vehiculeRegNumber) {
     Connection con = null;
     PreparedStatement ps = null;
     ResultSet rs = null;
@@ -54,14 +55,14 @@ public class TicketDAO {
       con = dataBaseConfig.getConnection();
       ps = con.prepareStatement(DBConstants.GET_TICKET);
       // ID, PARKING_NUMBER, VEHICLE_REG_NUMBER, PRICE, IN_TIME, OUT_TIME)
-      ps.setString(1, vehicleRegNumber);
+      ps.setString(1, vehiculeRegNumber);
       rs = ps.executeQuery();
       if (rs.next()) {
         ticket = new Ticket();
         ParkingSpot parkingSpot = new ParkingSpot(rs.getInt(1), ParkingType.valueOf(rs.getString(6)), false);
         ticket.setParkingSpot(parkingSpot);
         ticket.setId(rs.getInt(2));
-        ticket.setVehicleRegNumber(vehicleRegNumber);
+        ticket.setVehicleRegNumber(vehiculeRegNumber);
         ticket.setPrice(rs.getDouble(3));
         ticket.setInTime(rs.getTimestamp(4));
         ticket.setOutTime(rs.getTimestamp(5));
@@ -97,4 +98,35 @@ public class TicketDAO {
     }
     return false;
   }
+
+  public boolean verifyRegularRegNumberOfOneMonthDuration(String vehiculeRegNumber) {
+    Connection con = null;
+    PreparedStatement ps = null;
+    ResultSet rs = null;
+    
+    Calendar dateMinus1Month = Calendar.getInstance();
+    dateMinus1Month.add(Calendar.MONTH, -1);
+    
+    long countRegNumber = 0;
+    try {
+      con = dataBaseConfig.getConnection();
+      ps = con.prepareStatement(DBConstants.GET_COUNT_REGNUMBER_LAST_TIME);
+      ps.setString(1, vehiculeRegNumber);
+      ps.setTimestamp(2, new Timestamp(dateMinus1Month.getTimeInMillis()));
+      rs = ps.executeQuery();
+      if (rs.next()) {
+        countRegNumber = rs.getBigDecimal(1).longValue();
+      }
+    } catch (Exception ex) {
+      System.out.println("Error getting RegNumberFromDate");
+      logger.error("Error getting RegNumberFromDate", ex);
+    } finally {
+      dataBaseConfig.closeResultSet(rs);
+      dataBaseConfig.closePreparedStatement(ps);
+      dataBaseConfig.closeConnection(con);
+    }
+    return (countRegNumber >= 1);
+  }
+
+
 }

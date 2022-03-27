@@ -83,6 +83,47 @@ public class ParkingDataBaseIT {
   }
 
   @Test
+  @DisplayName("TI DB Une voiture entre")
+  public void testParking_RegularVehicule() {
+    try {
+      when(inputReaderUtil.readSelection()).thenReturn(1);
+      when(inputReaderUtil.readVehiculeRegistrationNumber()).thenReturn("ABCDEF");
+      ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+
+      DataBaseConfig dataBaseConfig = new DataBaseConfig();
+      Connection connection = dataBaseConfig.getConnection();
+
+      PreparedStatement psTicket = connection.prepareStatement(DBConstants.SAVE_TICKET);
+      // ID, PARKING_NUMBER, VEHICLE_REG_NUMBER, PRICE, IN_TIME, OUT_TIME)
+      psTicket.setInt(1, 1);
+      psTicket.setString(2, "ABCDEF");
+      psTicket.setDouble(3, 0);
+      psTicket.setTimestamp(4, new Timestamp(new Date(System.currentTimeMillis() - 2 * 60 * 60 * 1000).getTime()));
+      psTicket.setTimestamp(5, new Timestamp(new Date(System.currentTimeMillis() - 1 * 60 * 60 * 1000).getTime()));
+      psTicket.execute();
+      psTicket.setTimestamp(4, new Timestamp(new Date(System.currentTimeMillis() - 8 * 60 * 60 * 1000).getTime()));
+      psTicket.setTimestamp(5, new Timestamp(new Date(System.currentTimeMillis() - 7 * 60 * 60 * 1000).getTime()));
+      psTicket.execute();
+      dataBaseConfig.closePreparedStatement(psTicket);
+      
+      parkingService.processIncomingVehicule();
+
+      ResultSet rs = connection
+          .prepareStatement("select t.VEHICLE_REG_NUMBER from ticket t where t.VEHICLE_REG_NUMBER='ABCDEF'")
+          .executeQuery();
+
+      // ??? assertThat(????).isTrue();
+
+      dataBaseConfig.closeResultSet(rs);
+      dataBaseConfig.closeConnection(connection);
+
+    } catch (Exception e) {
+      fail("Exception not Expected");
+      e.printStackTrace();
+    }
+  }
+
+  @Test
   @DisplayName("TI DB Une voiture sort")
   public void testParkingLotExit() {
     try {
