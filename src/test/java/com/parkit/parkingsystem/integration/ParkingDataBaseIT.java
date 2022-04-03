@@ -2,6 +2,7 @@ package com.parkit.parkingsystem.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.parkit.parkingsystem.config.DataBaseConfig;
@@ -9,6 +10,7 @@ import com.parkit.parkingsystem.constants.DBConstants;
 import com.parkit.parkingsystem.dao.ParkingSpotDAO;
 import com.parkit.parkingsystem.dao.TicketDAO;
 import com.parkit.parkingsystem.integration.service.DataBasePrepareService;
+import com.parkit.parkingsystem.model.ParkingSpot;
 import com.parkit.parkingsystem.service.ParkingService;
 import com.parkit.parkingsystem.util.InputReaderUtil;
 import java.sql.Connection;
@@ -23,6 +25,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -83,18 +86,13 @@ public class ParkingDataBaseIT {
   }
 
   @Test
-  @DisplayName("TI DB Une voiture entre")
+  @DisplayName("TI DB Une voiture régulière (réduction 5%) entre")
   public void testParking_RegularVehicule() {
     try {
-      when(inputReaderUtil.readSelection()).thenReturn(1);
-      when(inputReaderUtil.readVehiculeRegistrationNumber()).thenReturn("ABCDEF");
-      ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
-
       DataBaseConfig dataBaseConfig = new DataBaseConfig();
       Connection connection = dataBaseConfig.getConnection();
 
       PreparedStatement psTicket = connection.prepareStatement(DBConstants.SAVE_TICKET);
-      // ID, PARKING_NUMBER, VEHICLE_REG_NUMBER, PRICE, IN_TIME, OUT_TIME)
       psTicket.setInt(1, 1);
       psTicket.setString(2, "ABCDEF");
       psTicket.setDouble(3, 0);
@@ -105,17 +103,32 @@ public class ParkingDataBaseIT {
       psTicket.setTimestamp(5, new Timestamp(new Date(System.currentTimeMillis() - 7 * 60 * 60 * 1000).getTime()));
       psTicket.execute();
       dataBaseConfig.closePreparedStatement(psTicket);
-      
-      parkingService.processIncomingVehicule();
-
-      ResultSet rs = connection
-          .prepareStatement("select t.VEHICLE_REG_NUMBER from ticket t where t.VEHICLE_REG_NUMBER='ABCDEF'")
-          .executeQuery();
-
-      // ??? assertThat(????).isTrue();
-
-      dataBaseConfig.closeResultSet(rs);
       dataBaseConfig.closeConnection(connection);
+      
+      assertThat(ticketDAO.verifyRegularRegNumberOfOneMonthDuration("ABCDEF")).isTrue();
+
+    } catch (Exception e) {
+      fail("Exception not Expected");
+      e.printStackTrace();
+    }
+  }
+
+  @Test
+  @DisplayName("TI DB Une nouvelle voiture (non régulier) entre")
+  public void testParking_NewVehicule() {
+    try {
+      DataBaseConfig dataBaseConfig = new DataBaseConfig();
+      Connection connection = dataBaseConfig.getConnection();
+
+      PreparedStatement psTicket = connection.prepareStatement(DBConstants.SAVE_TICKET);
+      psTicket.setInt(1, 1);
+      psTicket.setString(2, "12345");
+      psTicket.setDouble(3, 0);
+      psTicket.setTimestamp(4, new Timestamp(new Date(System.currentTimeMillis() - 2 * 60 * 60 * 1000).getTime()));
+      psTicket.setTimestamp(5, new Timestamp(new Date(System.currentTimeMillis() - 1 * 60 * 60 * 1000).getTime()));
+      psTicket.execute();
+      
+      assertThat(ticketDAO.verifyRegularRegNumberOfOneMonthDuration("ABCDEF")).isFalse();
 
     } catch (Exception e) {
       fail("Exception not Expected");

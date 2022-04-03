@@ -5,20 +5,21 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 
-public class InputReaderUtil {
+public class InputReaderUtil implements IInputReaderUtil{
 
   private static Scanner scan = new Scanner(System.in);
   private static final Logger logger = LogManager.getLogger("InputReaderUtil");
+  private static OutputWriterlUtil outputWriterUtil = new OutputWriterlUtil();
 
   public int readSelection() {
+    int input = -1;
     try {
-      int input = Integer.parseInt(scan.nextLine());
-      return input;
+      input = Integer.parseInt(scan.nextLine());
     } catch (Exception e) {
       logger.error("Error while reading user input from Shell", e);
-      System.out.println("Error reading input. Please enter valid number for proceeding further");
-      return -1;
+      outputWriterUtil.println("Error reading input. Please enter valid number for proceeding further");
     }
+    return input;
   }
 
   public String readVehiculeRegistrationNumber() throws Exception {
@@ -30,7 +31,7 @@ public class InputReaderUtil {
       return vehicleRegNumber;
     } catch (Exception e) {
       logger.error("Error while reading user input from Shell", e);
-      System.out.println("Error reading input. Please enter a valid string for vehicle registration number");
+      outputWriterUtil.println("Error reading input. Please enter a valid string for vehicle registration number");
       throw e;
     }
   }

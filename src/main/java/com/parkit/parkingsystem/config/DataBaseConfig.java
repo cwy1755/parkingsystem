@@ -1,19 +1,19 @@
 package com.parkit.parkingsystem.config;
 
-import com.parkit.parkingsystem.util.PropertiesReader;
+import com.parkit.parkingsystem.util.PropertiesReaderUtil;
 import java.io.IOException;
 import java.sql.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class DataBaseConfig {
+public class DataBaseConfig implements IDataBaseConfig{
 
   private static final Logger logger = LogManager.getLogger("DataBaseConfig");
 
   public Connection getConnection() throws ClassNotFoundException, SQLException, IOException {
     logger.trace("Create DB connection");
 
-    PropertiesReader reader = new PropertiesReader("application.properties");
+    PropertiesReaderUtil reader = new PropertiesReaderUtil("application.properties");
 
     String env = reader.getProperty("database.env");
     logger.trace("DB application.properties: " + env);

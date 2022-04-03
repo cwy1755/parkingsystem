@@ -4,13 +4,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-public class PropertiesReader {
+public class PropertiesReaderUtil {
   private Properties properties;
 
-  public PropertiesReader(String propertyFileName) throws IOException {
-    InputStream is = getClass().getClassLoader().getResourceAsStream(propertyFileName);
+  public PropertiesReaderUtil(String propertyFileName) throws IOException {
+    InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertyFileName);
     this.properties = new Properties();
-    this.properties.load(is);
+    this.properties.load(inputStream);
   }
 
   public String getProperty(String propertyName) {

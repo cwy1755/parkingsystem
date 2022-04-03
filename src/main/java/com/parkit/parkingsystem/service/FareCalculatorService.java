@@ -1,18 +1,22 @@
 package com.parkit.parkingsystem.service;
 
 import com.parkit.parkingsystem.constants.Fare;
+import com.parkit.parkingsystem.dao.ITicketDAO;
 import com.parkit.parkingsystem.dao.TicketDAO;
 import com.parkit.parkingsystem.model.Ticket;
+import com.parkit.parkingsystem.util.OutputWriterlUtil;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class FareCalculatorService {
 
   private static final Logger logger = LogManager.getLogger(FareCalculatorService.class);
+  private static OutputWriterlUtil ouputWriterUtil = new OutputWriterlUtil();
 
-  private TicketDAO ticketDAO;
+  private ITicketDAO ticketDAO;
 
-  public FareCalculatorService(TicketDAO ticketDAO) {
+  public FareCalculatorService(ITicketDAO ticketDAO) {
     this.ticketDAO = ticketDAO;
   }
 
@@ -63,7 +67,7 @@ public class FareCalculatorService {
           break;
         }
         default: {
-          System.out.println("Unkown Parking Type");
+          ouputWriterUtil.println("Unkown Parking Type");
           logger.warn(
               "Ticket: " + ticket.getId() + " : Parking Type unknown: " + ticket.getParkingSpot().getParkingType());
           throw new IllegalArgumentException("Unkown Parking Type");

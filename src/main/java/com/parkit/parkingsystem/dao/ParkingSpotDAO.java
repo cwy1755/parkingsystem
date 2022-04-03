@@ -1,9 +1,12 @@
 package com.parkit.parkingsystem.dao;
 
 import com.parkit.parkingsystem.config.DataBaseConfig;
+import com.parkit.parkingsystem.config.IDataBaseConfig;
 import com.parkit.parkingsystem.constants.DBConstants;
 import com.parkit.parkingsystem.constants.ParkingType;
 import com.parkit.parkingsystem.model.ParkingSpot;
+import com.parkit.parkingsystem.util.OutputWriterlUtil;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,10 +14,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 
-public class ParkingSpotDAO {
+public class ParkingSpotDAO implements IParkingSpotDAO{
   private static final Logger logger = LogManager.getLogger("ParkingSpotDAO");
+  private static OutputWriterlUtil outputWriterUtil = new OutputWriterlUtil(); 
 
-  public DataBaseConfig dataBaseConfig = new DataBaseConfig();
+  public IDataBaseConfig dataBaseConfig = new DataBaseConfig();
 
   public int getNextAvailableSlot(ParkingType parkingType) {
     Connection con = null;
@@ -30,7 +34,7 @@ public class ParkingSpotDAO {
         result = rs.getInt(1);
       }
     } catch (Exception ex) {
-      System.out.println("Error fetching next available slot");
+      outputWriterUtil.println("Error fetching next available slot");
       logger.error("Error fetching next available slot", ex);
     } finally {
       dataBaseConfig.closeResultSet(rs);
@@ -52,7 +56,7 @@ public class ParkingSpotDAO {
       ps.setInt(2, parkingSpot.getId());
       updateRowCount = ps.executeUpdate();
     } catch (Exception ex) {
-      System.out.println("Error updating parking info");
+      outputWriterUtil.println("Error updating parking info");
       logger.error("Error updating parking info", ex);
     } finally {
       dataBaseConfig.closePreparedStatement(ps);
