@@ -30,6 +30,7 @@ public class ParkingSpotDAO {
             dataBaseConfig.closeResultSet(rs);
             dataBaseConfig.closePreparedStatement(ps);
         }catch (Exception ex){
+        	System.out.println("Error fetching next available slot");
             logger.error("Error fetching next available slot",ex);
         }finally {
             dataBaseConfig.closeConnection(con);
@@ -38,7 +39,7 @@ public class ParkingSpotDAO {
     }
 
     public boolean updateParking(ParkingSpot parkingSpot){
-        //update the availability fo that parking slot
+        //update the availability for that parking slot
         Connection con = null;
         try {
             con = dataBaseConfig.getConnection();
@@ -49,6 +50,7 @@ public class ParkingSpotDAO {
             dataBaseConfig.closePreparedStatement(ps);
             return (updateRowCount == 1);
         }catch (Exception ex){
+        	System.out.println("Error updating parking info");
             logger.error("Error updating parking info",ex);
             return false;
         }finally {

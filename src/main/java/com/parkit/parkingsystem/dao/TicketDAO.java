@@ -26,6 +26,7 @@ public class TicketDAO {
             PreparedStatement ps = con.prepareStatement(DBConstants.SAVE_TICKET);
             //ID, PARKING_NUMBER, VEHICLE_REG_NUMBER, PRICE, IN_TIME, OUT_TIME)
             //ps.setInt(1,ticket.getId());
+            // ID is not compute here, it is auto-compute by mysql
             ps.setInt(1,ticket.getParkingSpot().getId());
             ps.setString(2, ticket.getVehicleRegNumber());
             ps.setDouble(3, ticket.getPrice());
@@ -33,7 +34,8 @@ public class TicketDAO {
             ps.setTimestamp(5, (ticket.getOutTime() == null)?null: (new Timestamp(ticket.getOutTime().getTime())) );
             return ps.execute();
         }catch (Exception ex){
-            logger.error("Error fetching next available slot",ex);
+        	System.out.println("Error saving ticket");
+            logger.error("Error saving ticket",ex);
         }finally {
             dataBaseConfig.closeConnection(con);
             return false;
@@ -62,7 +64,8 @@ public class TicketDAO {
             dataBaseConfig.closeResultSet(rs);
             dataBaseConfig.closePreparedStatement(ps);
         }catch (Exception ex){
-            logger.error("Error fetching next available slot",ex);
+        	System.out.println("Error getting ticket");
+            logger.error("Error getting ticket",ex);
         }finally {
             dataBaseConfig.closeConnection(con);
             return ticket;
@@ -80,7 +83,8 @@ public class TicketDAO {
             ps.execute();
             return true;
         }catch (Exception ex){
-            logger.error("Error saving ticket info",ex);
+        	System.out.println("Error updating ticket info");
+            logger.error("Error updating ticket info",ex);
         }finally {
             dataBaseConfig.closeConnection(con);
         }
