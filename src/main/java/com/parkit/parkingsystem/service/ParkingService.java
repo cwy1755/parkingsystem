@@ -19,7 +19,7 @@ public class ParkingService {
 
   private static final Logger logger = LogManager.getLogger("ParkingService");
   private static OutputWriterlUtil outputWriterUtil = new OutputWriterlUtil();
-  
+
   private IInputReaderUtil inputReaderUtil;
   private IParkingSpotDAO parkingSpotDAO;
   private ITicketDAO ticketDAO;
@@ -43,13 +43,10 @@ public class ParkingService {
 
       if (parkingSpot != null && parkingSpot.getId() > 0) {
         String vehiculeRegNumber = getVehiculeRegNumber();
-        
-        boolean regularRegNumber = ticketDAO.verifyRegularRegNumberOfOneMonthDuration(vehiculeRegNumber);
-        
-        if (regularRegNumber) {
-          outputWriterUtil.println("Welcome back! As a recurring user of our parking lot, you'll benefit from a 5% discount");
-        }
-        
+
+        verifyExistingRegNumber(vehiculeRegNumber);
+        verifyRegularRegNumberOfOneMonthDuration(vehiculeRegNumber);
+
         parkingSpot.setAvailable(false);
         parkingSpotDAO.updateParking(parkingSpot); // allow this parking space and mark it's availability as false
 
@@ -145,6 +142,20 @@ public class ParkingService {
     }
   }
 
+  public void verifyExistingRegNumber(String vehiculeRegNumber) throws Exception {
+    if (ticketDAO.verifyExistingRegNumber(vehiculeRegNumber) == true) {
+      outputWriterUtil.println("Error Vehicule reg number allready exist");
+      throw new Exception("Error Vehicule reg number allready exist");
+    }
+  }
+
+  public void verifyRegularRegNumberOfOneMonthDuration(String vehiculeRegNumber) {
+    if (ticketDAO.verifyRegularRegNumberOfOneMonthDuration(vehiculeRegNumber)) {
+      outputWriterUtil
+          .println("Welcome back! As a recurring user of our parking lot, you'll benefit from a 5% discount");
+    }
+  }
+
   /**
    * Exiting Vehicule.
    */
@@ -162,7 +173,8 @@ public class ParkingService {
         parkingSpot.setAvailable(true);
         parkingSpotDAO.updateParking(parkingSpot);
         outputWriterUtil.println("Please pay the parking fare:" + ticket.getPrice());
-        outputWriterUtil.println("Recorded out-time for vehicle number:" + ticket.getVehicleRegNumber() + " is:" + outTime);
+        outputWriterUtil
+            .println("Recorded out-time for vehicle number:" + ticket.getVehicleRegNumber() + " is:" + outTime);
       } else {
         outputWriterUtil.println("Unable to update ticket information. Error occurred");
       }

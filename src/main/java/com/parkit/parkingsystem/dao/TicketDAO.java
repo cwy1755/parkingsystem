@@ -16,11 +16,10 @@ import java.util.Calendar;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-
-public class TicketDAO implements ITicketDAO{
+public class TicketDAO implements ITicketDAO {
 
   private static final Logger logger = LogManager.getLogger("TicketDAO");
-  private static OutputWriterlUtil outputWriterUtil = new OutputWriterlUtil(); 
+  private static OutputWriterlUtil outputWriterUtil = new OutputWriterlUtil();
 
   public IDataBaseConfig dataBaseConfig = new DataBaseConfig();
 
@@ -103,14 +102,38 @@ public class TicketDAO implements ITicketDAO{
     return false;
   }
 
+  public boolean verifyExistingRegNumber(String vehiculeRegNumber) {
+    Connection con = null;
+    PreparedStatement ps = null;
+    ResultSet rs = null;
+    boolean findVehicule = false;
+    try {
+      con = dataBaseConfig.getConnection();
+      ps = con.prepareStatement(DBConstants.GET_EXISTING_REGNUMBER);
+      ps.setString(1, vehiculeRegNumber);
+      rs = ps.executeQuery();
+      if (rs.next()) {
+        findVehicule=true;
+      }
+    } catch (Exception ex) {
+      outputWriterUtil.println("Error verify Reg number");
+      logger.error("Error verify Reg number", ex);
+    } finally {
+      dataBaseConfig.closeResultSet(rs);
+      dataBaseConfig.closePreparedStatement(ps);
+      dataBaseConfig.closeConnection(con);
+    }
+    return findVehicule;
+  }
+
   public boolean verifyRegularRegNumberOfOneMonthDuration(String vehiculeRegNumber) {
     Connection con = null;
     PreparedStatement ps = null;
     ResultSet rs = null;
-    
+
     Calendar dateMinus1Month = Calendar.getInstance();
     dateMinus1Month.add(Calendar.MONTH, -1);
-    
+
     long countRegNumber = 0;
     try {
       con = dataBaseConfig.getConnection();
@@ -131,6 +154,5 @@ public class TicketDAO implements ITicketDAO{
     }
     return (countRegNumber >= 1);
   }
-
 
 }
