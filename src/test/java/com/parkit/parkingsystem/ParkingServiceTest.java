@@ -81,6 +81,7 @@ public class ParkingServiceTest {
       when(inputReaderUtil.readSelection()).thenReturn(1);
       when(parkingSpotDAO.getNextAvailableSlot(any(ParkingType.class))).thenReturn(1);
       when(inputReaderUtil.readVehiculeRegistrationNumber()).thenReturn("ABCDEF");
+      when(ticketDAO.verifyExistingRegNumber("ABCDEF")).thenReturn(false);
 
       parkingService.processIncomingVehicule();
       
@@ -99,6 +100,7 @@ public class ParkingServiceTest {
       when(inputReaderUtil.readSelection()).thenReturn(2);
       when(parkingSpotDAO.getNextAvailableSlot(any(ParkingType.class))).thenReturn(1);
       when(inputReaderUtil.readVehiculeRegistrationNumber()).thenReturn("ABCDEF");
+      when(ticketDAO.verifyExistingRegNumber("ABCDEF")).thenReturn(false);
 
       parkingService.processIncomingVehicule();
       
@@ -110,6 +112,25 @@ public class ParkingServiceTest {
     }
   }
 
+  @Test
+  @DisplayName("Une voiture entre, il y a une place, saisi immat, mais le reg number existe déjà")
+  public void processIncomingVehicule_CAR_Ano_existingRegNumber() {
+    try {
+      when(inputReaderUtil.readSelection()).thenReturn(1);
+      when(parkingSpotDAO.getNextAvailableSlot(any(ParkingType.class))).thenReturn(1);
+      when(inputReaderUtil.readVehiculeRegistrationNumber()).thenReturn("ABCDEF");
+      when(ticketDAO.verifyExistingRegNumber("ABCDEF")).thenReturn(true);
+
+      parkingService.processIncomingVehicule();
+      
+    } catch (Exception e) {
+      e.printStackTrace();
+      fail("Exception Expected");
+    }
+  }
+
+
+  
   @Test
   @DisplayName("Une voiture sort et tout est OK")
   public void processExitingVehicule_CAR_OK() {
@@ -135,7 +156,7 @@ public class ParkingServiceTest {
     }
   }
 
-  @Disabled
+  @Test
   @DisplayName("Une voiture sort, mais pb de maj du ticket")
   public void processExitingVehicule_CAR_AnoUpdateTicket() {
     try {
@@ -150,7 +171,7 @@ public class ParkingServiceTest {
       when(ticketDAO.getTicket(anyString())).thenReturn(ticket);
       when(ticketDAO.updateTicket(any(Ticket.class))).thenReturn(false);
       
-      // TODO
+      parkingService.processExitingVehicule();
       
     } catch (Exception e) {
       e.printStackTrace();

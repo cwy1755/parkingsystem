@@ -1,10 +1,13 @@
 package com.parkit.parkingsystem.dao;
 
 import com.parkit.parkingsystem.config.DataBaseConfig;
+import com.parkit.parkingsystem.config.IDataBaseConfig;
 import com.parkit.parkingsystem.constants.DBConstants;
 import com.parkit.parkingsystem.constants.ParkingType;
 import com.parkit.parkingsystem.model.ParkingSpot;
 import com.parkit.parkingsystem.model.Ticket;
+import com.parkit.parkingsystem.util.OutputWriterlUtil;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -13,12 +16,12 @@ import java.util.Calendar;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-
-public class TicketDAO {
+public class TicketDAO implements ITicketDAO {
 
   private static final Logger logger = LogManager.getLogger("TicketDAO");
+  private static OutputWriterlUtil outputWriterUtil = new OutputWriterlUtil();
 
-  public DataBaseConfig dataBaseConfig = new DataBaseConfig();
+  public IDataBaseConfig dataBaseConfig = new DataBaseConfig();
 
   public boolean saveTicket(Ticket ticket) {
     Connection con = null;
@@ -37,7 +40,7 @@ public class TicketDAO {
       ps.setTimestamp(5, (ticket.getOutTime() == null) ? null : (new Timestamp(ticket.getOutTime().getTime())));
       rcPsExecute = ps.execute();
     } catch (Exception ex) {
-      System.out.println("Error saving ticket");
+      outputWriterUtil.println("Error saving ticket");
       logger.error("Error saving ticket", ex);
     } finally {
       dataBaseConfig.closePreparedStatement(ps);
@@ -68,7 +71,7 @@ public class TicketDAO {
         ticket.setOutTime(rs.getTimestamp(5));
       }
     } catch (Exception ex) {
-      System.out.println("Error getting ticket");
+      outputWriterUtil.println("Error getting ticket");
       logger.error("Error getting ticket", ex);
     } finally {
       dataBaseConfig.closeResultSet(rs);
@@ -90,7 +93,7 @@ public class TicketDAO {
       ps.execute();
       return true;
     } catch (Exception ex) {
-      System.out.println("Error updating ticket info");
+      outputWriterUtil.println("Error updating ticket info");
       logger.error("Error updating ticket info", ex);
     } finally {
       dataBaseConfig.closePreparedStatement(ps);
@@ -99,14 +102,38 @@ public class TicketDAO {
     return false;
   }
 
+  public boolean verifyExistingRegNumber(String vehiculeRegNumber) {
+    Connection con = null;
+    PreparedStatement ps = null;
+    ResultSet rs = null;
+    boolean findVehicule = false;
+    try {
+      con = dataBaseConfig.getConnection();
+      ps = con.prepareStatement(DBConstants.GET_EXISTING_REGNUMBER);
+      ps.setString(1, vehiculeRegNumber);
+      rs = ps.executeQuery();
+      if (rs.next()) {
+        findVehicule=true;
+      }
+    } catch (Exception ex) {
+      outputWriterUtil.println("Error verify Reg number");
+      logger.error("Error verify Reg number", ex);
+    } finally {
+      dataBaseConfig.closeResultSet(rs);
+      dataBaseConfig.closePreparedStatement(ps);
+      dataBaseConfig.closeConnection(con);
+    }
+    return findVehicule;
+  }
+
   public boolean verifyRegularRegNumberOfOneMonthDuration(String vehiculeRegNumber) {
     Connection con = null;
     PreparedStatement ps = null;
     ResultSet rs = null;
-    
+
     Calendar dateMinus1Month = Calendar.getInstance();
     dateMinus1Month.add(Calendar.MONTH, -1);
-    
+
     long countRegNumber = 0;
     try {
       con = dataBaseConfig.getConnection();
@@ -118,7 +145,7 @@ public class TicketDAO {
         countRegNumber = rs.getBigDecimal(1).longValue();
       }
     } catch (Exception ex) {
-      System.out.println("Error getting RegNumberFromDate");
+      outputWriterUtil.println("Error getting RegNumberFromDate");
       logger.error("Error getting RegNumberFromDate", ex);
     } finally {
       dataBaseConfig.closeResultSet(rs);
@@ -127,6 +154,5 @@ public class TicketDAO {
     }
     return (countRegNumber >= 1);
   }
-
 
 }

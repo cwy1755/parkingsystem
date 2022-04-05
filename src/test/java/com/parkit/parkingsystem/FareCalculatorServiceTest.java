@@ -44,43 +44,6 @@ public class FareCalculatorServiceTest {
     }
   }
 
-  @Test
-  @DisplayName("Validation que le prix/heure pour une voiture est celle paramétré ")
-  public void calculateFareCar() {
-    Date nowTime = new Date();
-
-    Date inTime = new Date(nowTime.getTime() - (60 * 60 * 1000));
-    Date outTime = new Date(nowTime.getTime());
-    ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
-
-    ticket.setInTime(inTime);
-    ticket.setOutTime(outTime);
-    ticket.setVehicleRegNumber("ABCDEF");
-    ticket.setParkingSpot(parkingSpot);
-
-    fareCalculatorService.calculateFare(ticket);
-
-    assertThat(ticket.getPrice()).isEqualTo(Fare.CAR_RATE_PER_HOUR - Fare.CAR_RATE_PER_HOUR * Fare.TIME_FREE);
-  }
-
-  @Test
-  @DisplayName("Validation que le prix/heure pour une moto est celle paramétré ")
-  public void calculateFareBike() {
-    Date nowTime = new Date();
-
-    Date inTime = new Date(nowTime.getTime() - (60 * 60 * 1000));
-    Date outTime = new Date(nowTime.getTime());
-    ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.BIKE, false);
-
-    ticket.setInTime(inTime);
-    ticket.setOutTime(outTime);
-    ticket.setVehicleRegNumber("ABCDEF");
-    ticket.setParkingSpot(parkingSpot);
-
-    fareCalculatorService.calculateFare(ticket);
-
-    assertThat(ticket.getPrice()).isEqualTo(Fare.BIKE_RATE_PER_HOUR - Fare.BIKE_RATE_PER_HOUR * Fare.TIME_FREE);
-  }
 
   @Test
   @DisplayName("Validation qu'il n'y a pas calcul s'il y a un type de parking à null")
